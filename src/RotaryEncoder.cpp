@@ -38,21 +38,13 @@ const int8_t KNOBDIR[] = {
 
 // ----- Initialization and Default Values -----
 
-RotaryEncoder::RotaryEncoder(int pin1, int pin2, LatchMode mode)
+RotaryEncoder::RotaryEncoder(int8_t pinstate, LatchMode mode)
 {
   // Remember Hardware Setup
-  _pin1 = pin1;
-  _pin2 = pin2;
   _mode = mode;
 
-  // Setup the input pins and turn on pullup resistor
-  pinMode(pin1, INPUT_PULLUP);
-  pinMode(pin2, INPUT_PULLUP);
-
   // when not started in motion, the current state of the encoder should be 3
-  int sig1 = digitalRead(_pin1);
-  int sig2 = digitalRead(_pin2);
-  _oldState = sig1 | (sig2 << 1);
+  _oldState = pinstate;
 
   // start with position 0;
   _position = 0;
@@ -108,11 +100,9 @@ void RotaryEncoder::setPosition(long newPosition)
 } // setPosition()
 
 
-void RotaryEncoder::tick(void)
+void RotaryEncoder::tick(int8_t pinstate)
 {
-  int sig1 = digitalRead(_pin1);
-  int sig2 = digitalRead(_pin2);
-  int8_t thisState = sig1 | (sig2 << 1);
+  int8_t thisState = pinstate;
 
   if (_oldState != thisState) {
     _position += KNOBDIR[thisState | (_oldState << 2)];
